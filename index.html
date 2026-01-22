@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Calculadora Préstamo">
+
+<title>Calculadora de Préstamos</title>
+
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: #d4af37; /* Fondo dorado */
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 420px;
+    margin: auto;
+    background: #ffffff;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.logo img {
+    width: 120px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+input[readonly] {
+    background: #f0f0f0;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    margin-top: 18px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.result {
+    background: #eef6ff;
+    padding: 12px;
+    margin-top: 18px;
+    border-radius: 12px;
+    font-size: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        <img src="logo.png" alt="Imperium Financiero">
+    </div>
+
+    <h2>Calculadora de Préstamos</h2>
+
+    <label>Monto del préstamo ($)</label>
+    <input type="number" id="monto">
+
+    <label>Interés mensual (%)</label>
+    <input type="number" id="interes">
+
+    <label>Meses</label>
+    <input type="number" id="meses" value="1" oninput="actualizarPeriodos()">
+
+    <label>Tipo de cuota</label>
+    <select id="tipo" onchange="actualizarPeriodos()">
+        <option value="diaria">Diaria</option>
+        <option value="semanal">Semanal</option>
+        <option value="quincenal">Quincenal (cada 15 días)</option>
+        <option value="mensual">Mensual</option>
+    </select>
+
+    <label>Períodos de cobro</label>
+    <input type="number" id="periodos" readonly>
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div class="result" id="resultado"></div>
+</div>
+
+<script>
+function actualizarPeriodos() {
+    let meses = parseInt(document.getElementById("meses").value) || 0;
+    let tipo = document.getElementById("tipo").value;
+    let periodos = 0;
+
+    if (tipo === "diaria") {
+        periodos = meses * 20;
+    } else if (tipo === "semanal") {
+        periodos = meses * 4;
+    } else if (tipo === "quincenal") {
+        periodos = meses * 2;
+    } else {
+        periodos = meses;
+    }
+
+    document.getElementById("periodos").value = periodos;
+}
+
+actualizarPeriodos();
+
+function calcular() {
+    let monto = parseFloat(document.getElementById("monto").value);
+    let interesMensual = parseFloat(document.getElementById("interes").value) / 100;
+    let meses = parseInt(document.getElementById("meses").value);
+    let periodos = parseInt(document.getElementById("periodos").value);
+    let tipo = document.getElementById("tipo").value;
+
+    if (isNaN(monto) || isNaN(interesMensual) || isNaN(meses)) {
+        document.getElementById("resultado").innerHTML = "⚠️ Complete todos los campos";
+        return;
+    }
+
+    let interesTotal = monto * interesMensual * meses;
+    let totalPagar = monto + interesTotal;
+    let cuota = totalPagar / periodos;
+
+    document.getElementById("resultado").innerHTML = `
+        <strong>Tipo:</strong> ${tipo}<br>
+        <strong>Meses:</strong> ${meses}<br>
+        <strong>Períodos:</strong> ${periodos}<br>
+        <strong>Interés total:</strong> $${interesTotal.toFixed(2)}<br>
+        <strong>Total a pagar:</strong> $${totalPagar.toFixed(2)}<br>
+        <strong>Cuota:</strong> $${cuota.toFixed(2)}
+    `;
+}
+</script>
+
+</body>
+</html>
